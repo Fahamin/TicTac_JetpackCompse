@@ -3,7 +3,9 @@ package medication.smartpatient.tictacjetpackcompse
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -14,7 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import medication.smartpatient.tictacjetpackcompse.ui.theme.TicTacJetpackCompseTheme
@@ -44,13 +50,20 @@ fun tttScreen() {
     var moves = remember {
         mutableStateListOf<Boolean?>(true, false, null, false, true, null, null, null)
     }
+
+    val onTap: (Offset) -> Unit = {
+        if (playerTurn.value) {
+            val x = (it.x / 333).toInt()
+            val y = (it.y / 333).toInt()
+
+        }
+    }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         Text(text = "Tic Tac Tok")
         Head(playerTurn.value)
         Board(moves)
     }
-
 
 }
 
@@ -94,33 +107,97 @@ fun Head(playerTurn: Boolean) {
 }
 
 @Composable
-fun Board(moves: List<Boolean?>) {
+fun Board(moves: List<Boolean?>, onTap: (Offset) -> Unit) {
 
-    Row(
+    Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .background(Color.LightGray)
             .padding(32.dp)
-    ) {
+            .background(Color.LightGray)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = onTap)
+            }
 
+    ) {
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.fillMaxSize(1f)
         ) {
-            Row(modifier = Modifier
-                .height(2.dp)
-                .fillMaxSize(1f)
-                .background(Color.Black)) {
+            Row(
+                modifier = Modifier
+                    .height(2.dp)
+                    .fillMaxSize(1f)
+                    .background(Color.Black)
+            ) {
 
             }
-            Row(modifier = Modifier
-                .height(2.dp)
-                .fillMaxSize(1f)
-                .background(Color.Black)) {
+            Row(
+                modifier = Modifier
+                    .height(2.dp)
+                    .fillMaxSize(1f)
+                    .background(Color.Black)
+            ) {
 
             }
         }
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxSize(1f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .width(2.dp)
+                    .fillMaxSize(1f)
+                    .background(Color.Black)
+            ) {
+            }
+            Column(
+                modifier = Modifier
+                    .width(2.dp)
+                    .fillMaxSize(1f)
+                    .background(Color.Black)
+            ) {
 
+            }
+
+        }
+
+        Column(modifier = Modifier.fillMaxSize(1f)) {
+            for (i in 0..2) {
+                Row(modifier = Modifier.weight(1f)) {
+                    for (j in 0..2) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            getComposableFromMove(moves = moves[i * 2 + j])
+                        }
+                    }
+                }
+            }
+        }
     }
+}
+
+@Composable
+fun getComposableFromMove(moves: Boolean?) {
+    when (moves) {
+        true -> Image(
+            painter = painterResource(id = R.drawable.x),
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(1f),
+            colorFilter = ColorFilter.tint(Color.Blue)
+        )
+        false -> Image(
+            painter = painterResource(id = R.drawable.o),
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(1f),
+            colorFilter = ColorFilter.tint(Color.Red)
+        )
+        null -> Image(
+            painter = painterResource(id = R.drawable.nu),
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(1f),
+            colorFilter = ColorFilter.tint(Color.Red)
+        )
+    }
+
 }
 
